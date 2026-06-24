@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday, My Love! ❤️</title>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+      :root {
+        --bg-color: #fff5f6;
+        --card-bg: #ffffff;
+        --primary-color: #ff6b81;
+        --text-color: #4a4a4a;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      /* Welcome Overlay to allow audio auto-play */
+      #welcomeOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+
+      .enter-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        border-radius: 30px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+
+      .enter-btn:hover {
+        transform: scale(1.05);
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        display: none; /* Hidden until enter is clicked */
+      }
+
+      h1 {
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      p.subtitle {
+        font-size: 1.1rem;
+        color: #7d7d7d;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        max-width: 1000px;
+        width: 100%;
+        display: none; /* Hidden until enter is clicked */
+      }
+
+      .card-container {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(255, 107, 129, 0.15);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .secret-message {
+        text-align: center;
+        font-size: 1.05rem;
+        line-height: 1.5;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .secret-message span {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      /* Subtle background audio control on top right */
+      #audioControl {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: none;
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Audio elements (Uses an open-source soft piano/acoustic birthday track) -->
+    <audio id="bgMusic" loop>
+      <source
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- Welcome / Interaction Screen -->
+    <div id="welcomeOverlay">
+      <h1 style="margin-bottom: 30px; text-align: center; padding: 0 20px">
+        Hey Beautiful, I made something for you... 💖
+      </h1>
+      <button class="enter-btn" onclick="startBirthdayExperience()">
+        Open Your Gift
+      </button>
+    </div>
+
+    <header id="mainHeader">
+      <h1>Happy Birthday, Beautiful! 🎂✨</h1>
+      <p class="subtitle">
+        Scratch away the silver to reveal just a few reasons why I love you...
+      </p>
+    </header>
+
+    <div class="grid" id="cardGrid"></div>
+
+    <script>
+      const reasons = [
+        {
+          emoji: "❤️",
+          text: "Your Selflessness: You always put others before yourself. The way you care for the people around you inspires me every single day.",
+        },
+        {
+          emoji: "✨",
+          text: "Your Pure Kindness: You have the rarest, gentlest soul. You bring a warmth into every room you walk into, and you make the world softer.",
+        },
+        {
+          emoji: "🕊️",
+          text: "How Safe You Make Me Feel: No matter how chaotic life gets, just being next to you feels like coming home. Your empathy is my anchor.",
+        },
+        {
+          emoji: "🌟",
+          text: "Your Beautiful Smile: It's my absolute favorite view in the world. Seeing you genuinely happy is the best part of my day.",
+        },
+        {
+          emoji: "🤗",
+          text: "Your Heart: You listen with so much intent and love. You never fail to support me, even on my toughest days.",
+        },
+        {
+          emoji: "🎉",
+          text: "Just Being YOU: You are my best friend, my biggest comfort, and my favorite adventure. I am so incredibly lucky to love you.",
+        },
+      ];
+
+      function startBirthdayExperience() {
+        // Play Music
+        const music = document.getElementById("bgMusic");
+        music.volume = 0.4;
+        music.play().catch((e) => console.log("Audio play prevented:", e));
+
+        // Hide Overlay & Show content
+        document.getElementById("welcomeOverlay").style.opacity = "0";
+        setTimeout(() => {
+          document.getElementById("welcomeOverlay").style.display = "none";
+          document.getElementById("mainHeader").style.display = "block";
+
+          const grid = document.getElementById("cardGrid");
+          grid.style.display = "grid";
+
+          // Give the browser 100ms to calculate grid layouts perfectly
+          setTimeout(initCards, 100);
+        }, 500);
+      }
+
+      function initCards() {
+        const grid = document.getElementById("cardGrid");
+
+        reasons.forEach((reason) => {
+          const container = document.createElement("div");
+          container.className = "card-container";
+
+          const messageDiv = document.createElement("div");
+          messageDiv.className = "secret-message";
+          messageDiv.innerHTML = `<span>${reason.emoji}</span>${reason.text}`;
+          container.appendChild(messageDiv);
+
+          const canvas = document.createElement("canvas");
+          container.appendChild(canvas);
+          grid.appendChild(container);
+
+          // Explicitly set internal canvas coordinates to match its rendered CSS bounds
+          canvas.width = container.getBoundingClientRect().width;
+          canvas.height = container.getBoundingClientRect().height;
+
+          initCanvas(canvas);
+        });
+      }
+
+      function initCanvas(canvas) {
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "bold 16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Scratch Me! ✨", canvas.width / 2, canvas.height / 2);
+
+        let isDrawing = false;
+        let hasTriggeredConfetti = false;
+
+        function scratch(e) {
+          if (!isDrawing) return;
+
+          const rect = canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+          // Fixed math coordinate tracking to match actual layout size
+          const x = (clientX - rect.left) * (canvas.width / rect.width);
+          const y = (clientY - rect.top) * (canvas.height / rect.height);
+
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath();
+          ctx.arc(x, y, 25, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (!hasTriggeredConfetti) {
+            checkScratchPercentage();
+          }
+        }
+
+        function checkScratchPercentage() {
+          const imageData = ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+          ).data;
+          let cleared = 0;
+          let totalSamples = 0;
+
+          for (let i = 3; i < imageData.length; i += 120) {
+            totalSamples++;
+            if (imageData[i] === 0) {
+              cleared++;
+            }
+          }
+
+          if (cleared / totalSamples > 0.45) {
+            hasTriggeredConfetti = true;
+
+            canvas.style.transition = "opacity 0.5s ease";
+            canvas.style.opacity = "0";
+            setTimeout(() => canvas.remove(), 500);
+
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          }
+        }
+
+        // Event listeners
+        canvas.addEventListener("mousedown", () => (isDrawing = true));
+        canvas.addEventListener("mouseup", () => (isDrawing = false));
+        canvas.addEventListener("mousemove", scratch);
+        canvas.addEventListener("mouseleave", () => (isDrawing = false));
+
+        canvas.addEventListener("touchstart", (e) => {
+          isDrawing = true;
+          scratch(e);
+        });
+        canvas.addEventListener("touchend", () => (isDrawing = false));
+        canvas.addEventListener("touchmove", scratch);
+      }
+    </script>
+  </body>
+</html>
