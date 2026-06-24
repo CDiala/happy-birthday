@@ -62,6 +62,34 @@
         transform: scale(1.05);
       }
 
+      /* Floating Music Toggle Button */
+      #musicToggleBtn {
+        display: none; /* Hidden until overlay is clicked */
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1.5px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 20px;
+        cursor: pointer;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 12px rgba(255, 107, 129, 0.15);
+        transition: all 0.2s ease;
+        align-items: center;
+        gap: 6px;
+      }
+
+      #musicToggleBtn:hover {
+        transform: translateY(-2px);
+        background: var(--primary-color);
+        color: white;
+      }
+
       header {
         text-align: center;
         margin-bottom: 30px;
@@ -215,6 +243,12 @@
       <source src="birthday-song.mp3" type="audio/mpeg" />
     </audio>
 
+    <!-- Floating Music Controller -->
+    <button id="musicToggleBtn" onclick="toggleMusic()">
+      <span id="musicBtnIcon">🎵</span>
+      <span id="musicBtnText">Pause Music</span>
+    </button>
+
     <!-- Welcome Overlay -->
     <div id="welcomeOverlay">
       <h1 style="margin-bottom: 30px; text-align: center; padding: 0 20px">
@@ -236,7 +270,6 @@
     <!-- Standard Scratch Grid View Container -->
     <div id="scratchView">
       <div class="grid" id="cardGrid"></div>
-      <!-- This button pops up smoothly when the final card is scratched -->
       <div id="revealActionContainer">
         <button class="btn gold-btn" onclick="switchToSpotlightView()">
           ✨ Click to Reveal Your Grand Finale Gift! ✨
@@ -250,7 +283,7 @@
       <div class="spotlight-title">The Grand Finale</div>
       <div class="spotlight-text">
         I know how much you talk about building a legacy, so I wanted to invest
-        in your future the way you invest your heart in us.
+        in your future the way you invest your heart in everyone else.
         <br /><br />
         Happy Birthday, my love! You are officially a shareholder in <br />
         <strong style="color: #b7791f; font-size: 1.5rem"
@@ -259,7 +292,7 @@
         & <strong style="color: #b7791f; font-size: 1.5rem">MTN</strong>! 📈✨
       </div>
       <button class="btn secondary-btn" onclick="switchToScratchView()">
-        ← Go Back to Reasons
+        ← Go Back
       </button>
     </div>
 
@@ -306,8 +339,29 @@
           document.getElementById("mainHeader").style.display = "block";
           document.getElementById("scratchView").style.display = "flex";
 
+          // Show the pause button floating beautifully
+          document.getElementById("musicToggleBtn").style.display =
+            "inline-flex";
+
           initCards();
         }, 500);
+      }
+
+      // Toggle Music Function
+      function toggleMusic() {
+        const music = document.getElementById("bgMusic");
+        const icon = document.getElementById("musicBtnIcon");
+        const text = document.getElementById("musicBtnText");
+
+        if (music.paused) {
+          music.play();
+          icon.innerText = "🎵";
+          text.innerText = "Pause Music";
+        } else {
+          music.pause();
+          icon.innerText = "🔇";
+          text.innerText = "Play Music";
+        }
       }
 
       function initCards() {
@@ -419,7 +473,6 @@
               origin: { y: 0.6 },
             });
 
-            // Show the big reveal action CTA if the final card is scratched open
             if (isGrandFinale) {
               document.getElementById("revealActionContainer").style.display =
                 "block";
@@ -440,16 +493,11 @@
         canvas.addEventListener("touchmove", scratch);
       }
 
-      // Navigation Mechanics
       function switchToSpotlightView() {
-        // Hide grid view structures
         document.getElementById("scratchView").style.display = "none";
         document.getElementById("mainHeader").style.display = "none";
-
-        // Open large spotlight view
         document.getElementById("giftSpotlightView").style.display = "block";
 
-        // Big, celebratory rain of confetti upon opening the gift view!
         confetti({
           particleCount: 150,
           spread: 80,
@@ -465,10 +513,7 @@
       }
 
       function switchToScratchView() {
-        // Hide spotlight view
         document.getElementById("giftSpotlightView").style.display = "none";
-
-        // Re-enable original views seamlessly
         document.getElementById("mainHeader").style.display = "block";
         document.getElementById("scratchView").style.display = "flex";
       }
