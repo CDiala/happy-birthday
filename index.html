@@ -207,8 +207,8 @@
           const grid = document.getElementById("cardGrid");
           grid.style.display = "grid";
 
-          // Give the browser 100ms to calculate grid layouts perfectly
-          setTimeout(initCards, 100);
+          // Initialize cards
+          initCards();
         }, 500);
       }
 
@@ -228,11 +228,25 @@
           container.appendChild(canvas);
           grid.appendChild(container);
 
-          // Explicitly set internal canvas coordinates to match its rendered CSS bounds
-          canvas.width = container.getBoundingClientRect().width;
-          canvas.height = container.getBoundingClientRect().height;
+          // Use ResizeObserver to wait until the card container has its real, final layout size
+          const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+              const width = entry.contentRect.width || container.offsetWidth;
+              const height = entry.contentRect.height || container.offsetHeight;
 
-          initCanvas(canvas);
+              // Only initialize once dimensions are valid and greater than 0
+              if (width > 0 && height > 0) {
+                canvas.width = width;
+                canvas.height = height;
+                initCanvas(canvas);
+
+                // Disconnect observer so it doesn't redraw if she resizes her screen
+                resizeObserver.disconnect();
+              }
+            }
+          });
+
+          resizeObserver.observe(container);
         });
       }
 
@@ -258,7 +272,6 @@
           const clientX = e.touches ? e.touches[0].clientX : e.clientX;
           const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-          // Fixed math coordinate tracking to match actual layout size
           const x = (clientX - rect.left) * (canvas.width / rect.width);
           const y = (clientY - rect.top) * (canvas.height / rect.height);
 
@@ -304,7 +317,6 @@
           }
         }
 
-        // Event listeners
         canvas.addEventListener("mousedown", () => (isDrawing = true));
         canvas.addEventListener("mouseup", () => (isDrawing = false));
         canvas.addEventListener("mousemove", scratch);
