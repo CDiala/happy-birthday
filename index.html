@@ -27,7 +27,7 @@
         box-sizing: border-box;
       }
 
-      /* Welcome Overlay to allow audio auto-play */
+      /* Welcome Overlay */
       #welcomeOverlay {
         position: fixed;
         top: 0;
@@ -43,7 +43,7 @@
         transition: opacity 0.5s ease;
       }
 
-      .enter-btn {
+      .btn {
         background: var(--primary-color);
         color: white;
         border: none;
@@ -53,17 +53,19 @@
         cursor: pointer;
         box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
         font-weight: bold;
-        transition: transform 0.2s;
+        transition:
+          transform 0.2s,
+          background-color 0.2s;
       }
 
-      .enter-btn:hover {
+      .btn:hover {
         transform: scale(1.05);
       }
 
       header {
         text-align: center;
         margin-bottom: 30px;
-        display: none; /* Hidden until enter is clicked */
+        display: none;
       }
 
       h1 {
@@ -78,13 +80,21 @@
         color: #7d7d7d;
       }
 
+      /* Main Scratch Grid View */
+      #scratchView {
+        display: none;
+        width: 100%;
+        max-width: 1000px;
+        flex-direction: column;
+        align-items: center;
+      }
+
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 25px;
-        max-width: 1000px;
         width: 100%;
-        display: none; /* Hidden until enter is clicked */
+        margin-bottom: 30px;
       }
 
       .card-container {
@@ -126,35 +136,99 @@
         touch-action: none;
       }
 
-      /* Subtle background audio control on top right */
-      #audioControl {
-        position: fixed;
-        top: 20px;
-        right: 20px;
+      /* Grand Finale Reveal Button */
+      #revealActionContainer {
         display: none;
-        z-index: 100;
+        text-align: center;
+        margin-top: 10px;
+        animation: pulse 2s infinite;
+      }
+
+      .gold-btn {
+        background: linear-gradient(45deg, #d4af37, #f3e5ab);
+        color: #5c4033;
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+      }
+
+      /* The Massive Spotlight Gift Card View */
+      #giftSpotlightView {
+        display: none;
+        width: 100%;
+        max-width: 650px;
+        background: var(--card-bg);
+        border-radius: 25px;
+        box-shadow: 0 15px 35px rgba(212, 175, 55, 0.25);
+        border: 3px solid #ffd700;
+        padding: 40px 30px;
+        box-sizing: border-box;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .spotlight-emoji {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .spotlight-title {
+        font-size: 2.2rem;
+        color: #d4af37;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .spotlight-text {
+        font-size: 1.3rem;
+        line-height: 1.8;
+        color: #333;
+        margin-bottom: 35px;
+      }
+
+      .secondary-btn {
+        background: #e2e8f0;
+        color: #4a5568;
+        box-shadow: none;
+        padding: 10px 25px;
+        font-size: 1rem;
+      }
+      .secondary-btn:hover {
+        background: #cbd5e1;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Audio elements (Uses an open-source soft piano/acoustic birthday track) -->
+    <!-- Background Music Track -->
     <audio id="bgMusic" loop>
       <source
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
         type="audio/mpeg"
       />
     </audio>
 
-    <!-- Welcome / Interaction Screen -->
+    <!-- Welcome Overlay -->
     <div id="welcomeOverlay">
       <h1 style="margin-bottom: 30px; text-align: center; padding: 0 20px">
         Hey Beautiful, I made something for you... 💖
       </h1>
-      <button class="enter-btn" onclick="startBirthdayExperience()">
+      <button class="btn" onclick="startBirthdayExperience()">
         Open Your Gift
       </button>
     </div>
 
+    <!-- Main View Header -->
     <header id="mainHeader">
       <h1>Happy Birthday, Beautiful! 🎂✨</h1>
       <p class="subtitle">
@@ -162,7 +236,35 @@
       </p>
     </header>
 
-    <div class="grid" id="cardGrid"></div>
+    <!-- Standard Scratch Grid View Container -->
+    <div id="scratchView">
+      <div class="grid" id="cardGrid"></div>
+      <!-- This button pops up smoothly when the final card is scratched -->
+      <div id="revealActionContainer">
+        <button class="btn gold-btn" onclick="switchToSpotlightView()">
+          ✨ Click to Reveal Your Grand Finale Gift! ✨
+        </button>
+      </div>
+    </div>
+
+    <!-- The Large Spotlight Gift Card View -->
+    <div id="giftSpotlightView">
+      <span class="spotlight-emoji">🎁</span>
+      <div class="spotlight-title">The Grand Finale</div>
+      <div class="spotlight-text">
+        I know how much you talk about building a legacy, so I wanted to invest
+        in your future the way you invest your heart in us.
+        <br /><br />
+        Happy Birthday, my love! You are officially a shareholder in <br />
+        <strong style="color: #b7791f; font-size: 1.5rem"
+          >Aradel Holdings</strong
+        >
+        & <strong style="color: #b7791f; font-size: 1.5rem">MTN</strong>! 📈✨
+      </div>
+      <button class="btn secondary-btn" onclick="switchToScratchView()">
+        ← Go Back to Reasons
+      </button>
+    </div>
 
     <script>
       const reasons = [
@@ -190,34 +292,39 @@
           emoji: "🎉",
           text: "Just Being YOU: You are my best friend, my biggest comfort, and my favorite adventure. I am so incredibly lucky to love you.",
         },
+        {
+          emoji: "🎁",
+          text: "Tap the shiny button below to reveal your true birthday surprise! 👇",
+        },
       ];
 
       function startBirthdayExperience() {
-        // Play Music
         const music = document.getElementById("bgMusic");
         music.volume = 0.4;
         music.play().catch((e) => console.log("Audio play prevented:", e));
 
-        // Hide Overlay & Show content
         document.getElementById("welcomeOverlay").style.opacity = "0";
         setTimeout(() => {
           document.getElementById("welcomeOverlay").style.display = "none";
           document.getElementById("mainHeader").style.display = "block";
+          document.getElementById("scratchView").style.display = "flex";
 
-          const grid = document.getElementById("cardGrid");
-          grid.style.display = "grid";
-
-          // Initialize cards
           initCards();
         }, 500);
       }
 
       function initCards() {
         const grid = document.getElementById("cardGrid");
+        grid.innerHTML = "";
 
-        reasons.forEach((reason) => {
+        reasons.forEach((reason, index) => {
           const container = document.createElement("div");
           container.className = "card-container";
+
+          if (index === reasons.length - 1) {
+            container.style.border = "2px solid #ffd700";
+            container.style.boxShadow = "0 10px 25px rgba(255, 215, 0, 0.3)";
+          }
 
           const messageDiv = document.createElement("div");
           messageDiv.className = "secret-message";
@@ -228,19 +335,15 @@
           container.appendChild(canvas);
           grid.appendChild(container);
 
-          // Use ResizeObserver to wait until the card container has its real, final layout size
           const resizeObserver = new ResizeObserver((entries) => {
             for (let entry of entries) {
               const width = entry.contentRect.width || container.offsetWidth;
               const height = entry.contentRect.height || container.offsetHeight;
 
-              // Only initialize once dimensions are valid and greater than 0
               if (width > 0 && height > 0) {
                 canvas.width = width;
                 canvas.height = height;
-                initCanvas(canvas);
-
-                // Disconnect observer so it doesn't redraw if she resizes her screen
+                initCanvas(canvas, index === reasons.length - 1);
                 resizeObserver.disconnect();
               }
             }
@@ -250,17 +353,21 @@
         });
       }
 
-      function initCanvas(canvas) {
+      function initCanvas(canvas, isGrandFinale) {
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "#cbd5e1";
+        ctx.fillStyle = isGrandFinale ? "#ecc94b" : "#cbd5e1";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#64748b";
+        ctx.fillStyle = isGrandFinale ? "#744210" : "#64748b";
         ctx.font = "bold 16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("Scratch Me! ✨", canvas.width / 2, canvas.height / 2);
+        ctx.fillText(
+          isGrandFinale ? "The Grand Finale! 🎁✨" : "Scratch Me! ✨",
+          canvas.width / 2,
+          canvas.height / 2,
+        );
 
         let isDrawing = false;
         let hasTriggeredConfetti = false;
@@ -310,10 +417,16 @@
             setTimeout(() => canvas.remove(), 500);
 
             confetti({
-              particleCount: 100,
+              particleCount: isGrandFinale ? 200 : 100,
               spread: 70,
               origin: { y: 0.6 },
             });
+
+            // Show the big reveal action CTA if the final card is scratched open
+            if (isGrandFinale) {
+              document.getElementById("revealActionContainer").style.display =
+                "block";
+            }
           }
         }
 
@@ -328,6 +441,39 @@
         });
         canvas.addEventListener("touchend", () => (isDrawing = false));
         canvas.addEventListener("touchmove", scratch);
+      }
+
+      // Navigation Mechanics
+      function switchToSpotlightView() {
+        // Hide grid view structures
+        document.getElementById("scratchView").style.display = "none";
+        document.getElementById("mainHeader").style.display = "none";
+
+        // Open large spotlight view
+        document.getElementById("giftSpotlightView").style.display = "block";
+
+        // Big, celebratory rain of confetti upon opening the gift view!
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          angle: 60,
+          origin: { x: 0 },
+        });
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          angle: 120,
+          origin: { x: 1 },
+        });
+      }
+
+      function switchToScratchView() {
+        // Hide spotlight view
+        document.getElementById("giftSpotlightView").style.display = "none";
+
+        // Re-enable original views seamlessly
+        document.getElementById("mainHeader").style.display = "block";
+        document.getElementById("scratchView").style.display = "flex";
       }
     </script>
   </body>
